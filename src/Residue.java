@@ -422,7 +422,16 @@ public class Residue
         {
             this.coords.x += this.atomsLateralChain.get(at).coords.x;
             this.coords.y += this.atomsLateralChain.get(at).coords.y;
-            this.coords.z += this.atomsLateralChain.get(at).coords.z;                        
+            this.coords.z += this.atomsLateralChain.get(at).coords.z;
+            
+            lowerBound.x = Math.min(lowerBound.x, this.atomsLateralChain.get(at).coords.x);
+            lowerBound.y = Math.min(lowerBound.y, this.atomsLateralChain.get(at).coords.y);
+            lowerBound.z = Math.min(lowerBound.z, this.atomsLateralChain.get(at).coords.z);
+            
+            upperBound.x = Math.max(upperBound.x, this.atomsLateralChain.get(at).coords.x);
+            upperBound.y = Math.max(upperBound.y, this.atomsLateralChain.get(at).coords.y);
+            upperBound.z = Math.max(upperBound.z, this.atomsLateralChain.get(at).coords.z);
+            
         }
         this.coords.x /= numFields + atomsLateralChain.size();
         this.coords.y /= numFields + atomsLateralChain.size();
@@ -438,12 +447,15 @@ public class Residue
                 this.radius = dist;
             }
         }
-        
-        Field[] fields = Backbone.class.getFields();
-        
-        Iterator<Atom> iterLateralChain = this.atomsLateralChain.iterator();
-
-
+        for(Field f : this.atomsBackbone.getClass().getFields())
+        {
+            Atom backboneAtom = (Atom) f.get(this.atomsBackbone);
+            double dist =  AlgebraFunctions.calculateDistance(this.coords, backboneAtom.coords);
+            if( dist > this.radius)
+            {
+                this.radius = dist;
+            }
+        }
     }
     
     public void calculateNormalVector(boolean flipFlag)
